@@ -1,3 +1,4 @@
+
 class Sphere : public GraphicsObj {
     public:
         double radius;

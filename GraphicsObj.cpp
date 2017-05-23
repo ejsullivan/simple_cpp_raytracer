@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include "raytracer.h"
 #include "vec3.h"
 #include "GraphicsObj.h"
 

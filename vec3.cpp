@@ -33,12 +33,11 @@ vec3 vec3::operator+ (const vec3& param) {
 	return vec3(x + param.x, y + param.y, z + param.z);
 }
 
-/*
-int main() {
-	vec3 vector = vec3(1.0, 0.0, 0.0);
-	std::cout << vector.magnitude() << std::endl;
-	vector = vector + vec3(1.0, 1.0, 1.0);
-	std::cout << vec3::dot(vec3(1.0, 0.0, 0.0), vec3(1.0, 0.0, 0.0)) << std::endl;
-	std::cout << vec3::cross(vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0)).z << std::endl;
-	std::cout << "length: " << vec3::normalize(vec3(6.4, 8.6, 1.2)).magnitude() << std::endl;
-}*/
+vec3 vec3::operator- (const vec3& param) {
+	return vec3(x - param.x, y - param.y, z - param.z);
+}
+
+vec3 vec3::operator* (const double& param) {
+	return vec3(this->x*param, this->y*param, this->z*param);
+}
+
