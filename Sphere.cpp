@@ -19,7 +19,7 @@ bool Sphere::rayIntersection(vec3 origin, vec3 direction) {
 }
 
 vec3 Sphere::calculateSurfaceNormal(vec3 surface_pos) {
-    return surface_pos - *position;
+    return vec3::normalize(surface_pos - *position);
 }
 
 vec3 Sphere::calculateRayIntersection(vec3 origin, vec3 direction) {

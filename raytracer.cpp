@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include <algorithm>
 #include "vec3.h"
 #include "GraphicsObj.h"
 #include "Sphere.h"
@@ -19,6 +20,10 @@ typedef struct color {
 COLOR white = {1.0, 1.0, 1.0};
 COLOR black = {0.0, 0.0, 0.0};
 
+vec3 operator* (const double& a, const vec3& b) {
+    return vec3(a*b.x, a*b.y, a*b.z);
+}
+
 void load_scene_file(char * file_name) {
     return;
 }
@@ -33,14 +38,10 @@ void print_ppm_image(char * file_name, int width, int height, COLOR ** image, in
 
     for (int i = 0; i < height; i++)
         for (int j = 0; j < width; j++)
-            ppm_file << image[j][i].red * max_intensity << " " << image[j][i].green * max_intensity << " " << image[j][i].blue * max_intensity << std::endl;
+            ppm_file << (int)(image[j][i].red * max_intensity) << " " << (int)(image[j][i].green * max_intensity) << " " << (int)(image[j][i].blue * max_intensity) << std::endl;
 
     ppm_file.close();
     return;
-}
-
-vec3 operator* (const double& a, const vec3& b) {
-    return vec3(a*b.x, a*b.y, a*b.z);
 }
 
 COLOR * trace_ray(vec3 origin, vec3 direction) {
@@ -63,8 +64,11 @@ int main() {
     vec3 camera_ray_vert_inc = eye_vert_axis/((double)HEIGHT);
     vec3 upper_left_pixel = camera_ray_horiz_inc * ((double) WIDTH/2.0) + camera_ray_vert_inc * ((double) HEIGHT/2.0) - camera_ray_horiz_inc/2.0 - camera_ray_vert_inc/2.0;
     vec3 curr_ray_dir = vec3(0.0, 0.0, 0.0);
+    vec3 light = vec3(1.0, 2.0, 2.0);
 
     Sphere sphere = Sphere(new vec3(0.0, 0.0, 3.0), 1.0);
+    double color = 1.0;
+    double ambient_coeff = 0.4;
 
     COLOR ** image = new COLOR*[WIDTH];
     for (int i = 0; i < WIDTH; i++)
@@ -73,10 +77,12 @@ int main() {
     for (double i = 0; i < (double)HEIGHT; i = i + 1.0) {
         for (double j = 0; j < (double)WIDTH; j = j + 1.0) {
             curr_ray_dir = vec3::normalize(gaze*screen_offset + upper_left_pixel - camera_ray_horiz_inc*j - camera_ray_vert_inc*i);
-            if (sphere.rayIntersection(origin, curr_ray_dir))
-                image[(int)j][(int)i] = {1.0, 1.0, 1.0};
+            if (sphere.rayIntersection(origin, curr_ray_dir)) {
+                color = 1.0 * pow(std::max(vec3::dot(sphere.calculateSurfaceNormal(sphere.calculateRayIntersection(origin, curr_ray_dir)), vec3::normalize(light - sphere.calculateRayIntersection(origin, curr_ray_dir))), 0.0), 2.0);
+                image[(int)j][(int)i] = {color + ambient_coeff, color + ambient_coeff, color + ambient_coeff};
+            }
             else
-                image[(int)j][(int)i] = {0.0, 0.0, 0.0};
+                image[(int)j][(int)i] = {0.1, 0.1, 0.1};
         }
     }
 
