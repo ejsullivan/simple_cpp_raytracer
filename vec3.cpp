@@ -12,6 +12,10 @@ double vec3::magnitude() {
 	return sqrt(x*x + y*y + z*z);
 }
 
+void vec3::print() {
+	std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
+}
+
 double vec3::dot(vec3 a, vec3 b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
@@ -41,3 +45,6 @@ vec3 vec3::operator* (const double& param) {
 	return vec3(this->x*param, this->y*param, this->z*param);
 }
 
+vec3 vec3::operator/ (const double& param) {
+	return vec3(this->x/param, this->y/param, this->z/param);
+}
