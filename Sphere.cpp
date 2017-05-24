@@ -29,3 +29,7 @@ vec3 Sphere::calculateRayIntersection(vec3 origin, vec3 direction) {
     distance = std::min(b + root, b - root);
     return (direction * distance) + origin;
 }
+
+COLOR Sphere::getSurfaceColor(vec3 surface_pos) {
+    return {1.0, 1.0, 1.0};
+}

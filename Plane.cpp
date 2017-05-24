@@ -28,3 +28,16 @@ vec3 Plane::calculateRayIntersection(vec3 origin, vec3 direction) {
     distance = vec3::dot(*normal, (*position - origin))/n_dot_dir;
     return (direction * distance) + origin;
 }
+
+COLOR Plane::getSurfaceColor(vec3 surface_pos) {
+    if (abs(surface_pos.x) - ((int)abs(surface_pos.x)) < 0.5)
+        if (abs(surface_pos.z) - ((int)abs(surface_pos.z)) >= 0.5)
+            return {0.5, 2.0, 0.5};
+        else
+            return {0.0, 0.5, 0.0};
+    else
+        if (abs(surface_pos.z) - ((int)abs(surface_pos.z)) < 0.5)
+            return {0.5, 2.0, 0.5};
+        else
+            return {0.0, 0.5, 0.0};
+}
