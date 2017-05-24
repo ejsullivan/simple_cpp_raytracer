@@ -8,8 +8,8 @@
 #include "Sphere.h"
 #include "Plane.h"
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1080
+#define HEIGHT 1080
 
 COLOR white = {1.0, 1.0, 1.0};
 COLOR black = {0.0, 0.0, 0.0};
@@ -87,7 +87,7 @@ COLOR trace_ray(vec3 origin, vec3 direction, std::vector<GraphicsObj *> &objects
         surface_red = surface_color.red;
         surface_green = surface_color.green;
         surface_blue = surface_color.blue;
-        if (check_occlusion(ray_intersection, reflection, objects)) {
+        if (check_occlusion(ray_intersection, vec3::normalize(light - ray_intersection), objects)) {
             surface_red *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
             surface_green *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
             surface_blue *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
