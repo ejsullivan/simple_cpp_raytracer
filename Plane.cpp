@@ -5,7 +5,7 @@
 #include "GraphicsObj.h"
 #include "Plane.h"
 
-Plane::Plane(vec3 * position, vec3 * normal) : GraphicsObj(position) {
+Plane::Plane(vec3 * position, MATERIAL obj_material, vec3 * normal) : GraphicsObj(position, obj_material) {
     this->normal = normal;
 }
 
@@ -30,14 +30,14 @@ vec3 Plane::calculateRayIntersection(vec3 origin, vec3 direction) {
 }
 
 COLOR Plane::getSurfaceColor(vec3 surface_pos) {
-    if (abs(surface_pos.x) - ((int)abs(surface_pos.x)) < 0.5)
-        if (abs(surface_pos.z) - ((int)abs(surface_pos.z)) >= 0.5)
-            return {0.5, 2.0, 0.5};
+    if (std::abs(surface_pos.x) - ((int)std::abs(surface_pos.x)) < 0.5)
+        if (std::abs(surface_pos.z) - ((int)std::abs(surface_pos.z)) >= 0.5)
+            return {1.0, 1.0, 1.0};
         else
-            return {0.0, 0.5, 0.0};
+            return {0.0, 0.0, 0.0};
     else
-        if (abs(surface_pos.z) - ((int)abs(surface_pos.z)) < 0.5)
-            return {0.5, 2.0, 0.5};
+        if (std::abs(surface_pos.z) - ((int)std::abs(surface_pos.z)) < 0.5)
+            return {1.0, 1.0, 1.0};
         else
-            return {0.0, 0.5, 0.0};
+            return {0.0, 0.0, 0.0};
 }

@@ -1,3 +1,10 @@
+typedef enum material {
+    DIELECTRIC,
+    CONDUCTOR,
+    MIRROR,
+    GLASS
+} MATERIAL;
+
 typedef struct color {
     double red;
     double green;
@@ -7,7 +14,8 @@ typedef struct color {
 class GraphicsObj {
     public:
         vec3 * position;
-        GraphicsObj(vec3 * position); // set the object to have the given postion
+        MATERIAL obj_material;
+        GraphicsObj(vec3 * position, MATERIAL obj_material); // set the object to have the given postion
         double calculateDistanceFrom(vec3 * point); // Calculates the distance from the point to the object
         virtual bool rayIntersection(vec3 origin, vec3 direction) = 0; // Check to see if a given ray intersects the sphere
         virtual vec3 calculateSurfaceNormal(vec3 surface_pos) = 0; // Calculate the normal vector to the object at the given position 

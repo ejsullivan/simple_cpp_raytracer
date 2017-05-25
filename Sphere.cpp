@@ -5,7 +5,7 @@
 #include "GraphicsObj.h"
 #include "Sphere.h"
 
-Sphere::Sphere(vec3 * position, double radius) : GraphicsObj(position) {
+Sphere::Sphere(vec3 * position, MATERIAL obj_material, double radius) : GraphicsObj(position, obj_material) {
     this->radius = radius;
 }
 

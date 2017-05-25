@@ -4,8 +4,9 @@
 #include "vec3.h"
 #include "GraphicsObj.h"
 
-GraphicsObj::GraphicsObj(vec3 * position) {
+GraphicsObj::GraphicsObj(vec3 * position, MATERIAL obj_material) {
     this->position = position;
+    this->obj_material = obj_material;
 }
 
 double GraphicsObj::calculateDistanceFrom(vec3 * point) {

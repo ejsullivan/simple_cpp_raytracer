@@ -8,8 +8,8 @@
 #include "Sphere.h"
 #include "Plane.h"
 
-#define WIDTH 1080
-#define HEIGHT 1080
+#define WIDTH 1200
+#define HEIGHT 1200
 
 COLOR white = {1.0, 1.0, 1.0};
 COLOR black = {0.0, 0.0, 0.0};
@@ -62,6 +62,7 @@ COLOR trace_ray(vec3 origin, vec3 direction, std::vector<GraphicsObj *> &objects
     COLOR surface_color;
     vec3 ray_intersection = vec3(0.0, 0.0, 0.0);
     vec3 reflection = vec3(0.0, 0.0, 0.0);
+    vec3 reflected_ray = vec3(0.0, 0.0, 0.0);
     GraphicsObj * curr_object = NULL;
     GraphicsObj * object_in_view = NULL;
 
@@ -83,21 +84,27 @@ COLOR trace_ray(vec3 origin, vec3 direction, std::vector<GraphicsObj *> &objects
     if (object_in_view == NULL)
         return background;
     else {
-        surface_color = object_in_view->getSurfaceColor(ray_intersection);
-        surface_red = surface_color.red;
-        surface_green = surface_color.green;
-        surface_blue = surface_color.blue;
-        if (check_occlusion(ray_intersection, vec3::normalize(light - ray_intersection), objects)) {
-            surface_red *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-            surface_green *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-            surface_blue *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+        if (object_in_view->obj_material == MATERIAL::DIELECTRIC) {
+            surface_color = object_in_view->getSurfaceColor(ray_intersection);
+            surface_red = surface_color.red;
+            surface_green = surface_color.green;
+            surface_blue = surface_color.blue;
+            if (check_occlusion(ray_intersection, vec3::normalize(light - ray_intersection), objects)) {
+                surface_red *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+                surface_green *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+                surface_blue *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+            }
+            else {
+                surface_red *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+                surface_green *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+                surface_blue *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+            }
+            return {surface_red + ambient_coeff, surface_green + ambient_coeff, surface_blue + ambient_coeff};
         }
-        else {
-            surface_red *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-            surface_green *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-            surface_blue *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+        else if (object_in_view->obj_material == MATERIAL::MIRROR) {
+            reflected_ray = direction - 2.0*vec3::dot(direction, reflection)*reflection;
+            return trace_ray(ray_intersection, vec3::normalize(reflected_ray), objects, ray_bounce_count + 1);
         }
-        return {surface_red + ambient_coeff, surface_green + ambient_coeff, surface_blue + ambient_coeff};
     }
 }
 
@@ -118,9 +125,9 @@ int main() {
     vec3 upper_left_pixel = camera_ray_horiz_inc * ((double) WIDTH/2.0) + camera_ray_vert_inc * ((double) HEIGHT/2.0) - camera_ray_horiz_inc/2.0 - camera_ray_vert_inc/2.0;
     vec3 curr_ray_dir = vec3(0.0, 0.0, 0.0);
 
-    Sphere sphere = Sphere(new vec3(0.0, 3.0, 2.0), 1.0);
-    Sphere sphere2 = Sphere(new vec3(-2.0, 3.0, 3.5), 1.0);
-    Plane plane = Plane(new vec3(0.0, -1.5, 0.0), new vec3(0.0, 1.0, 0.0));
+    Sphere sphere = Sphere(new vec3(0.0, 3.0, 2.0), MATERIAL::DIELECTRIC, 1.0);
+    Sphere sphere2 = Sphere(new vec3(-2.0, 3.0, 3.5), MATERIAL::DIELECTRIC, 1.0);
+    Plane plane = Plane(new vec3(0.0, -1.5, 0.0), MATERIAL::DIELECTRIC, new vec3(0.0, 1.0, 0.0));
     std::vector<GraphicsObj *> objects;
 
     objects.push_back(&sphere);
