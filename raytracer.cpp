@@ -27,22 +27,27 @@ void load_scene_file(char * file_name) {
 
 void print_ppm_image(char * file_name, int width, int height, COLOR ** image, int max_intensity) {
     std::ofstream ppm_file;
+    std::string ppm_string = "";
     double red, green, blue;
 
     ppm_file.open(file_name);
 
-    ppm_file << "P3" << std::endl;
-    ppm_file << width << " " << height << std::endl;
-    ppm_file << max_intensity << std::endl;
+    ppm_string += "P3\n";
+    ppm_string += std::to_string(width) + " " + std::to_string(height) + "\n";
+    ppm_string += std::to_string(max_intensity) + "\n";
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             red = image[j][i].red;
             green = image[j][i].green;
             blue = image[j][i].blue;
-            ppm_file << (int)(std::min(red * max_intensity, (double)max_intensity)) << " " << (int)(std::min(green * max_intensity, (double)max_intensity)) << " " << (int)(std::min(blue * max_intensity, (double)max_intensity)) << std::endl;
+            ppm_string += std::to_string((int)(std::min(red * max_intensity, (double)max_intensity))) + " ";
+            ppm_string += std::to_string((int)(std::min(green * max_intensity, (double)max_intensity))) + " ";
+            ppm_string += std::to_string((int)(std::min(blue * max_intensity, (double)max_intensity))) + "\n";
         }
     }
+
+    ppm_file << ppm_string << std::endl;
 
     ppm_file.close();
     return;
@@ -59,11 +64,16 @@ COLOR trace_ray(vec3 origin, vec3 direction, std::vector<GraphicsObj *> &objects
     double distance = 99999999.99;
     double color = 1.0;
     double surface_red, surface_green, surface_blue;
+    double occlusion = 1.0;
+
     COLOR surface_color;
     COLOR reflection_color;
+
     vec3 ray_intersection = vec3(0.0, 0.0, 0.0);
     vec3 surface_normal = vec3(0.0, 0.0, 0.0);
     vec3 reflected_ray = vec3(0.0, 0.0, 0.0);
+    vec3 surface_to_light = vec3(0.0, 0.0, 0.0);
+
     GraphicsObj * curr_object = NULL;
     GraphicsObj * object_in_view = NULL;
 
@@ -89,17 +99,17 @@ COLOR trace_ray(vec3 origin, vec3 direction, std::vector<GraphicsObj *> &objects
         surface_red = surface_color.red;
         surface_green = surface_color.green;
         surface_blue = surface_color.blue;
+
+        surface_normal = object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction));
+        surface_to_light = vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction));
+
         if (object_in_view->obj_material == MATERIAL::DIELECTRIC) {
             if (check_occlusion(ray_intersection, vec3::normalize(light - ray_intersection), objects)) {
-                surface_red *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-                surface_green *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-                surface_blue *= .4 * pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
+                occlusion = 0.2;
             }
-            else {
-                surface_red *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-                surface_green *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-                surface_blue *= pow(std::max(vec3::dot(object_in_view->calculateSurfaceNormal(object_in_view->calculateRayIntersection(origin, direction)), vec3::normalize(light - object_in_view->calculateRayIntersection(origin, direction))), 0.0), 2.0);
-            }
+            surface_red *= occlusion * pow(std::max(vec3::dot(surface_normal, surface_to_light), 0.0), 2.0);
+            surface_green *= occlusion * pow(std::max(vec3::dot(surface_normal, surface_to_light), 0.0), 2.0);
+            surface_blue *= occlusion * pow(std::max(vec3::dot(surface_normal, surface_to_light), 0.0), 2.0);
             return {surface_red + ambient_coeff, surface_green + ambient_coeff, surface_blue + ambient_coeff};
         }
         else if (object_in_view->obj_material == MATERIAL::MIRROR) {
