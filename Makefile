@@ -1,2 +1,3 @@
+
 all:
-	g++ *.cpp -o raytracer
+	g++ -O3 -msse4 *.cpp -o raytracer
