@@ -21,7 +21,8 @@ vec3 Plane::calculateSurfaceNormal(vec3 surface_pos) {
 }
 
 vec3 Plane::calculateRayIntersection(vec3 origin, vec3 direction) {
-    double n_dot_dir, distance;
+    float n_dot_dir;
+    float distance;
     n_dot_dir = vec3::dot(*normal, direction);
     if (n_dot_dir > 0)
         return vec3(0.0, 0.0, 0.0);

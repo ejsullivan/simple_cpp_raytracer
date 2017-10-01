@@ -9,6 +9,7 @@ GraphicsObj::GraphicsObj(vec3 * position, MATERIAL obj_material) {
     this->obj_material = obj_material;
 }
 
-double GraphicsObj::calculateDistanceFrom(vec3 * point) {
-    return sqrt(pow(point->x - position->x, 2.0) + pow(point->y - position->y, 2.0) + pow(point->z - position->z, 2.0));
+float GraphicsObj::calculateDistanceFrom(vec3 * point) {
+    return (*point - *position).magnitude();
+    //return sqrt(pow(point->x - position->x, 2.0) + pow(point->y - position->y, 2.0) + pow(point->z - position->z, 2.0));
 }
