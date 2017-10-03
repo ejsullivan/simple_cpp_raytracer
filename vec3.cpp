@@ -9,14 +9,7 @@ vec3::vec3(float x, float y, float z) {
 	vector = _mm_set_ps(0.0f, z, y, x);
 }
 
-vec3::vec3(__m128 vector) {
-	this->x = vector[0];
-	this->y = vector[0];
-	this->z = vector[0];
-	this->vector = vector;
-}
-
-float vec3::magnitude() {
+float vec3::magnitude() const {
 	__m128 mult_result;
 	__m128 result;
 	__m128 temp;
@@ -33,7 +26,7 @@ void vec3::print() {
 	std::cout << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << std::endl;
 }
 
-float vec3::dot(vec3 a, vec3 b) {
+float vec3::dot(const vec3& a, const vec3& b) {
 	__m128 mult_result;
 	__m128 result;
 	__m128 temp;
@@ -46,7 +39,7 @@ float vec3::dot(vec3 a, vec3 b) {
 	return _mm_cvtss_f32(result);
 }
 
-vec3 vec3::cross(vec3 a, vec3 b) {
+vec3 vec3::cross(const vec3& a, const vec3& b) {
 	__m128 lhs;
 	__m128 rhs;
 	__m128 result;
@@ -65,7 +58,7 @@ vec3 vec3::cross(vec3 a, vec3 b) {
 	return vec3(result[0], result[1], result[2]); // Should not do this because it violates strong aliasing rules
 }
 
-vec3 vec3::normalize(vec3 a) {
+vec3 vec3::normalize(const vec3& a) {
 	double length = a.magnitude();
 	__m128 denominator = _mm_set_ps(length, length, length, length);
 	__m128 result = _mm_div_ps(a.vector, denominator);
@@ -73,21 +66,21 @@ vec3 vec3::normalize(vec3 a) {
 	//return vec3(a.x/length, a.y/length, a.z/length);
 }
 
-vec3 vec3::operator+ (const vec3& param) {
+vec3 vec3::operator+ (const vec3& param) const {
 	__m128 result;
 	result = _mm_add_ps(vector, param.vector);
 	return vec3(result[0], result[1], result[2]); // Should not do this because it violates strong aliasing rules
 	//return vec3(x + param.x, y + param.y, z + param.z);
 }
 
-vec3 vec3::operator- (const vec3& param) {
+vec3 vec3::operator- (const vec3& param) const {
 	__m128 result;
 	result = _mm_sub_ps(vector, param.vector);
 	return vec3(result[0], result[1], result[2]); // Should not do this because it violates strong aliasing rules
 	//return vec3(x - param.x, y - param.y, z - param.z);
 }
 
-vec3 vec3::operator* (const double& param) {
+vec3 vec3::operator* (const double& param) const {
 	__m128 result;
 	__m128 denominator = _mm_set_ps(param, param, param, param);
 	result = _mm_mul_ps(vector, denominator);
@@ -95,7 +88,7 @@ vec3 vec3::operator* (const double& param) {
 	//return vec3(this->x*param, this->y*param, this->z*param);
 }
 
-vec3 vec3::operator/ (const double& param) {
+vec3 vec3::operator/ (const double& param) const {
 	__m128 result;
 	__m128 denominator = _mm_set_ps(param, param, param, param);
 	result = _mm_div_ps(vector, denominator);
